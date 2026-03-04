@@ -5,12 +5,18 @@
  */
 
 import type { BundleAddresses } from '@/features/launcher/types/ghost';
+import type {
+  ExecutionType,
+  ExecutionParams,
+  EvaluationResult,
+} from './agent';
 
 /**
  * Launch status states
  */
 export type LaunchStatus =
   | 'pending'     // Waiting for scheduled time
+  | 'waiting'     // Waiting for market conditions (market_optimized)
   | 'processing'  // Being submitted to Jito
   | 'completed'   // Successfully landed on-chain
   | 'failed'      // Submission failed
@@ -27,6 +33,9 @@ export interface ScheduledLaunch {
   launchAt: Date;
   status: LaunchStatus;
   jitoTipLamports: number;
+  executionType: ExecutionType;
+  executionParams: ExecutionParams;
+  lastEvaluation?: EvaluationResult;
   createdAt: Date;
   updatedAt: Date;
   completedAt?: Date;
@@ -45,6 +54,9 @@ export interface ScheduledLaunchRow {
   launch_at: string;
   status: LaunchStatus;
   jito_tip_lamports: number;
+  execution_type: ExecutionType;
+  execution_params: ExecutionParams;
+  last_evaluation: EvaluationResult | null;
   created_at: string;
   updated_at: string;
   completed_at: string | null;
@@ -60,6 +72,8 @@ export interface ScheduleLaunchParams {
   bundleAddresses: BundleAddresses;
   launchAt: Date;
   jitoTipLamports: number;
+  executionType?: ExecutionType;
+  executionParams?: ExecutionParams;
 }
 
 /**
@@ -74,6 +88,9 @@ export function rowToScheduledLaunch(row: ScheduledLaunchRow): ScheduledLaunch {
     launchAt: new Date(row.launch_at),
     status: row.status,
     jitoTipLamports: row.jito_tip_lamports,
+    executionType: row.execution_type,
+    executionParams: row.execution_params,
+    lastEvaluation: row.last_evaluation ?? undefined,
     createdAt: new Date(row.created_at),
     updatedAt: new Date(row.updated_at),
     completedAt: row.completed_at ? new Date(row.completed_at) : undefined,

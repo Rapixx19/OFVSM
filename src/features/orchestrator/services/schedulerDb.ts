@@ -15,6 +15,8 @@ import {
   rowToScheduledLaunch,
   MAX_PENDING_LAUNCHES,
 } from '../types/scheduler';
+import type { EvaluationResult } from '../types/agent';
+import { DEFAULT_EXECUTION_PARAMS } from '../types/agent';
 
 const TABLE_NAME = 'scheduled_launches';
 
@@ -26,16 +28,22 @@ export async function insertScheduledLaunch(
   walletAddress: string,
   params: ScheduleLaunchParams
 ): Promise<ScheduledLaunch> {
-  // Check pending launch limit
+  // Check pending/waiting launch limit
   const { count } = await supabase
     .from(TABLE_NAME)
     .select('*', { count: 'exact', head: true })
     .eq('creator_wallet', walletAddress)
-    .eq('status', 'pending');
+    .in('status', ['pending', 'waiting']);
 
   if (count && count >= MAX_PENDING_LAUNCHES) {
     throw new Error(`Maximum ${MAX_PENDING_LAUNCHES} pending launches allowed`);
   }
+
+  const executionType = params.executionType || 'timestamp';
+  const executionParams = { ...DEFAULT_EXECUTION_PARAMS, ...params.executionParams };
+
+  // Market-optimized launches start as 'waiting'
+  const status = executionType === 'market_optimized' ? 'waiting' : 'pending';
 
   const { data, error } = await supabase
     .from(TABLE_NAME)
@@ -45,7 +53,9 @@ export async function insertScheduledLaunch(
       bundle_addresses: params.bundleAddresses,
       launch_at: params.launchAt.toISOString(),
       jito_tip_lamports: params.jitoTipLamports,
-      status: 'pending',
+      execution_type: executionType,
+      execution_params: executionParams,
+      status,
     })
     .select()
     .single();
@@ -117,7 +127,7 @@ export async function updateLaunchStatus(
 }
 
 /**
- * Cancel a pending launch
+ * Cancel a pending or waiting launch
  */
 export async function cancelLaunch(
   supabase: SupabaseClient,
@@ -129,7 +139,39 @@ export async function cancelLaunch(
     .update({ status: 'cancelled' })
     .eq('id', id)
     .eq('creator_wallet', walletAddress)
-    .eq('status', 'pending');
+    .in('status', ['pending', 'waiting']);
+
+  if (error) throw error;
+}
+
+/**
+ * Get waiting launches for market evaluation
+ */
+export async function getWaitingLaunches(
+  supabase: SupabaseClient
+): Promise<ScheduledLaunch[]> {
+  const { data, error } = await supabase
+    .from(TABLE_NAME)
+    .select('*')
+    .eq('status', 'waiting')
+    .order('created_at', { ascending: true });
+
+  if (error) throw error;
+  return (data as ScheduledLaunchRow[]).map(rowToScheduledLaunch);
+}
+
+/**
+ * Update last evaluation result for a launch
+ */
+export async function updateLaunchEvaluation(
+  supabase: SupabaseClient,
+  id: string,
+  evaluation: EvaluationResult
+): Promise<void> {
+  const { error } = await supabase
+    .from(TABLE_NAME)
+    .update({ last_evaluation: evaluation })
+    .eq('id', id);
 
   if (error) throw error;
 }

@@ -4,6 +4,7 @@
  * @dependencies N/A
  */
 
+export { AgentToggle } from './AgentToggle';
 export { ScheduleToggle } from './ScheduleToggle';
 export { SpeedGauge } from './SpeedGauge';
 export { SpeedModeToggle } from './SpeedModeToggle';

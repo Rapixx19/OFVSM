@@ -20,6 +20,8 @@ import {
   MINIMUM_TIP_LAMPORTS,
   MAXIMUM_TIP_LAMPORTS,
 } from '@/features/launcher/constants/addresses';
+import { AgentToggle } from '@/components/features/orchestrator';
+import type { ExecutionType, MarketConditions } from '@/features/orchestrator/types/agent';
 
 /**
  * Props for ReviewStep
@@ -37,6 +39,10 @@ interface ReviewStepProps {
   onReset: () => void;
   canLaunch: boolean;
   isLoading: boolean;
+  executionType?: ExecutionType;
+  onExecutionTypeChange?: (type: ExecutionType) => void;
+  lastConditions?: MarketConditions | null;
+  isStrategistLoading?: boolean;
 }
 
 /**
@@ -69,6 +75,10 @@ export function ReviewStep({
   onReset,
   canLaunch,
   isLoading,
+  executionType = 'timestamp',
+  onExecutionTypeChange,
+  lastConditions,
+  isStrategistLoading,
 }: ReviewStepProps) {
   // Calculate fees on mount and when params change
   useEffect(() => {
@@ -343,6 +353,17 @@ export function ReviewStep({
           )}
         </AnimatePresence>
       </div>
+
+      {/* Strategist Agent Toggle */}
+      {onExecutionTypeChange && (
+        <AgentToggle
+          executionType={executionType}
+          onExecutionTypeChange={onExecutionTypeChange}
+          lastConditions={lastConditions}
+          isLoading={isStrategistLoading}
+          disabled={isLoading}
+        />
+      )}
 
       {/* Error message */}
       <AnimatePresence>

@@ -16,8 +16,12 @@ import {
   updateLaunchStatus,
   cancelLaunch,
   getPendingDueLaunches,
+  getWaitingLaunches,
+  updateLaunchEvaluation,
 } from './schedulerDb';
 import { JITO_BLOCK_ENGINE_URL } from '@/features/launcher/constants/addresses';
+import { MarketEvaluator } from '../agents/StrategistAgent';
+import { DEFAULT_EXECUTION_PARAMS } from '../types/agent';
 
 /**
  * LaunchScheduler - Manages scheduled token launches
@@ -25,10 +29,12 @@ import { JITO_BLOCK_ENGINE_URL } from '@/features/launcher/constants/addresses';
 export class LaunchScheduler {
   private supabase: SupabaseClient;
   private connection: Connection;
+  private marketEvaluator: MarketEvaluator;
 
-  constructor(supabase: SupabaseClient, connection: Connection) {
+  constructor(supabase: SupabaseClient, connection: Connection, heliusApiKey?: string) {
     this.supabase = supabase;
     this.connection = connection;
+    this.marketEvaluator = new MarketEvaluator(heliusApiKey);
   }
 
   /**
@@ -68,7 +74,14 @@ export class LaunchScheduler {
    */
   async getPendingLaunches(walletAddress: string): Promise<ScheduledLaunch[]> {
     const launches = await this.getLaunches(walletAddress);
-    return launches.filter((l) => l.status === 'pending');
+    return launches.filter((l) => l.status === 'pending' || l.status === 'waiting');
+  }
+
+  /**
+   * Get waiting launches (market-optimized)
+   */
+  async getWaitingLaunches(): Promise<ScheduledLaunch[]> {
+    return getWaitingLaunches(this.supabase);
   }
 
   /**
@@ -79,6 +92,52 @@ export class LaunchScheduler {
 
     for (const launch of dueLaunches) {
       await this.processLaunch(launch);
+    }
+  }
+
+  /**
+   * Process market-optimized launches waiting for conditions
+   */
+  async processMarketOptimizedLaunches(): Promise<void> {
+    const waitingLaunches = await getWaitingLaunches(this.supabase);
+
+    for (const launch of waitingLaunches) {
+      await this.evaluateAndMaybeExecute(launch);
+    }
+  }
+
+  /**
+   * Evaluate market conditions and execute if GO
+   */
+  private async evaluateAndMaybeExecute(launch: ScheduledLaunch): Promise<void> {
+    try {
+      // Get current market conditions
+      const conditions = await this.marketEvaluator.getMarketConditions();
+
+      // Merge default params with launch-specific params
+      const params = { ...DEFAULT_EXECUTION_PARAMS, ...launch.executionParams };
+
+      // Evaluate conditions
+      const evaluation = this.marketEvaluator.evaluate(conditions, params);
+
+      // Always update the last evaluation
+      await updateLaunchEvaluation(this.supabase, launch.id, evaluation);
+
+      // Check if max wait time exceeded
+      const maxWaitMs = (params.maxWaitHours ?? 24) * 60 * 60 * 1000;
+      const waitedMs = Date.now() - launch.createdAt.getTime();
+      const maxWaitExceeded = waitedMs > maxWaitMs;
+
+      if (evaluation.isGo || maxWaitExceeded) {
+        // Execute the launch
+        await this.processLaunch(launch);
+      }
+      // If NO-GO and within wait window, just leave it in 'waiting' status
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      await updateLaunchStatus(this.supabase, launch.id, 'failed', {
+        errorMessage: `Market evaluation failed: ${message}`,
+      });
     }
   }
 
