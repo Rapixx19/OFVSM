@@ -128,3 +128,11 @@ export const LOCKER_ERROR_MESSAGES: Record<LockerErrorCode, string> = {
   [LockerErrorCode.InvalidMint]: 'Invalid LP token mint',
   [LockerErrorCode.ArithmeticOverflow]: 'Arithmetic overflow',
 };
+
+// Re-export sentinel types for convenience
+export type {
+  SecurityEventType,
+  SecurityCertificate,
+  SafetyEvent,
+  ExpiringLock,
+} from './sentinel';

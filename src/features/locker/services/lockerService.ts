@@ -17,6 +17,7 @@ import {
   TOKEN_2022_PROGRAM_ID,
   getAssociatedTokenAddressSync,
 } from '@solana/spl-token';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import {
   LOCKER_PROGRAM_ID,
   LOCKER_SEED,
@@ -28,6 +29,7 @@ import {
   type LockLpParams,
   type ExtendLockParams,
 } from '../types/locker';
+import type { SecurityEventType } from '../types/sentinel';
 
 /**
  * Derive the Locker PDA address
@@ -363,5 +365,34 @@ export class LockerService {
     creator?: string
   ): Promise<SafeStandardStatus> {
     return getLockStatus(this.connection, mint, creator);
+  }
+}
+
+/**
+ * Trigger a security alert and log to safety_events table
+ *
+ * @param supabase - Supabase client
+ * @param type - Type of security event
+ * @param tokenMint - The token mint address
+ * @param creatorWallet - The creator wallet address
+ * @param details - Additional event details
+ */
+export async function triggerSecurityAlert(
+  supabase: SupabaseClient,
+  type: SecurityEventType,
+  tokenMint: string,
+  creatorWallet: string,
+  details?: Record<string, unknown>
+): Promise<void> {
+  const { error } = await supabase.from('safety_events').insert({
+    type,
+    token_mint: tokenMint,
+    creator_wallet: creatorWallet,
+    details: details ?? {},
+  });
+
+  if (error) {
+    console.error('Failed to insert safety event:', error);
+    throw error;
   }
 }
