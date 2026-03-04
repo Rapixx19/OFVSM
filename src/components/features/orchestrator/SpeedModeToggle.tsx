@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useSpeedMode } from '@/features/orchestrator/hooks/useSpeedMode';
 import { SpeedGauge } from './SpeedGauge';
 import { DEFAULT_SOL_CAP_LAMPORTS } from '@/features/orchestrator/types/speedMode';
+import { lightTap } from '@/core/utils/haptics';
 
 /**
  * Speed Mode Toggle Component
@@ -27,6 +28,7 @@ export function SpeedModeToggle() {
   const totalCapSol = DEFAULT_SOL_CAP_LAMPORTS / 1e9;
 
   const handleToggle = async () => {
+    lightTap();
     if (isEnabled) {
       await disableSpeedMode();
     } else {

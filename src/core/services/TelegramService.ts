@@ -4,6 +4,8 @@
  * @dependencies N/A
  */
 
+import { truncateAddress } from '@/core/utils/crypto';
+
 /**
  * Telegram Bot API endpoint
  */
@@ -85,19 +87,13 @@ export class TelegramService {
 ${verifiedBadge}
 
 🔒 LP Lock: <b>${alert.lockDays} Days</b>
-📍 Mint: <code>${this.truncateAddress(alert.mintAddress)}</code>
+📍 Mint: <code>${truncateAddress(alert.mintAddress)}</code>
 
 <a href="${solscanUrl}">View on Solscan</a>
 
 Launched via VECTERAI Foundation`;
   }
 
-  /**
-   * Truncate address for display
-   */
-  private truncateAddress(address: string): string {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
-  }
 }
 
 let telegramInstance: TelegramService | null = null;

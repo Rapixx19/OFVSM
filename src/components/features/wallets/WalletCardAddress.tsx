@@ -9,10 +9,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { lightTap } from '@/core/utils/haptics';
+import { truncateAddress } from '@/core/utils/crypto';
 
-export function truncateAddress(address: string): string {
-  return `${address.slice(0, 4)}...${address.slice(-4)}`;
-}
+export { truncateAddress };
 
 interface WalletCardAddressProps {
   address: string;

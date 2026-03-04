@@ -7,10 +7,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-
-function truncateAddress(address: string): string {
-  return `${address.slice(0, 4)}...${address.slice(-4)}`;
-}
+import { truncateAddress } from '@/core/utils/crypto';
 
 interface SwitchingOverlayProps {
   targetAddress: string;

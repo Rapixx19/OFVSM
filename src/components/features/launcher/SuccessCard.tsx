@@ -10,6 +10,7 @@ import { useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { successPulse, lightTap } from '@/core/utils/haptics';
 import { playSuccessChime } from '@/core/utils/audio';
+import { truncateAddress } from '@/core/utils/crypto';
 import { ShareButton } from './ShareButton';
 import { DownloadButton } from './DownloadButton';
 import { HypeGenerator } from './HypeGenerator';
@@ -37,13 +38,6 @@ function formatTimestamp(date: Date): string {
     minute: '2-digit',
     timeZoneName: 'short',
   });
-}
-
-/**
- * Truncate address for display
- */
-function truncateAddress(address: string): string {
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
 /**

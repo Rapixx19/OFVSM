@@ -16,6 +16,8 @@ import {
   acceptLegalShield as acceptLegalShieldService,
   CURRENT_LEGAL_SHIELD_VERSION,
 } from '@/features/auth/services/profileService';
+import { successPulse } from '@/core/utils/haptics';
+import { playSuccessChime } from '@/core/utils/audio';
 
 /**
  * Return type for useVectAuth hook
@@ -160,12 +162,16 @@ export function useVectAuth(): UseVectAuthReturn {
       setProfile(userProfile);
       setAuthenticated(true);
 
+      // Success feedback
+      successPulse();
+      playSuccessChime();
+
       // Production-only SIWS handshake log
       if (process.env.NODE_ENV === 'production') {
         console.log(
           '%c🤝 SIWS Handshake Complete',
           'color: #22d3ee; font-weight: bold; font-size: 14px;',
-          `\n   Wallet: ${walletAddress.slice(0, 8)}...${walletAddress.slice(-4)}`,
+          `\n   Wallet: ${walletAddress.slice(0, 4)}...${walletAddress.slice(-4)}`,
           `\n   Domain: ${typeof window !== 'undefined' ? window.location.hostname : 'server'}`,
           `\n   Time: ${new Date().toISOString()}`
         );

@@ -8,6 +8,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useMemo } from 'react';
+import { lightTap } from '@/core/utils/haptics';
 
 interface ScheduleToggleProps {
   onSchedule: (date: Date) => void;
@@ -72,7 +73,7 @@ export function ScheduleToggle({ onSchedule, disabled }: ScheduleToggleProps) {
       <motion.button
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => { lightTap(); setIsOpen(!isOpen); }}
         disabled={disabled}
         className={`
           flex items-center gap-2 rounded-lg border px-4 py-2
@@ -108,7 +109,7 @@ export function ScheduleToggle({ onSchedule, disabled }: ScheduleToggleProps) {
               {presetDates.map((preset) => (
                 <button
                   key={preset.label}
-                  onClick={() => handlePresetSelect(preset.date)}
+                  onClick={() => { lightTap(); handlePresetSelect(preset.date); }}
                   className={`
                     w-full rounded-lg border p-3 text-left transition-colors
                     ${selectedDate?.getTime() === preset.date.getTime()
@@ -143,7 +144,7 @@ export function ScheduleToggle({ onSchedule, disabled }: ScheduleToggleProps) {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={handleConfirm}
+              onClick={() => { lightTap(); handleConfirm(); }}
               disabled={!selectedDate}
               className={`
                 mt-4 w-full rounded-lg py-2 text-sm font-semibold

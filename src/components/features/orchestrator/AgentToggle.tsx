@@ -9,6 +9,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ExecutionType, ExecutionParams, MarketConditions } from '@/features/orchestrator/types/agent';
 import { DEFAULT_EXECUTION_PARAMS } from '@/features/orchestrator/types/agent';
+import { lightTap } from '@/core/utils/haptics';
 
 /**
  * Props for AgentToggle
@@ -52,6 +53,7 @@ export function AgentToggle({
 
   const handleToggle = () => {
     if (disabled) return;
+    lightTap();
     onExecutionTypeChange(isEnabled ? 'timestamp' : 'market_optimized');
   };
 
