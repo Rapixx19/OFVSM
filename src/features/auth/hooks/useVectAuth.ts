@@ -159,6 +159,17 @@ export function useVectAuth(): UseVectAuthReturn {
       const userProfile = await getOrCreateProfile(walletAddress);
       setProfile(userProfile);
       setAuthenticated(true);
+
+      // Production-only SIWS handshake log
+      if (process.env.NODE_ENV === 'production') {
+        console.log(
+          '%c🤝 SIWS Handshake Complete',
+          'color: #22d3ee; font-weight: bold; font-size: 14px;',
+          `\n   Wallet: ${walletAddress.slice(0, 8)}...${walletAddress.slice(-4)}`,
+          `\n   Domain: ${typeof window !== 'undefined' ? window.location.hostname : 'server'}`,
+          `\n   Time: ${new Date().toISOString()}`
+        );
+      }
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err : new Error('Sign in failed');

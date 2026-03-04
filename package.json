@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run verify-env && next build",
+    "build:skip-verify": "next build",
+    "verify-env": "npx ts-node scripts/verify-deployment.ts",
     "start": "next start",
     "lint": "eslint src --fix",
     "lint:check": "eslint src",
