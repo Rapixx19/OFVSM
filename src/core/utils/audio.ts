@@ -88,3 +88,39 @@ export function playErrorTone(): void {
   oscillator.start(now);
   oscillator.stop(now + duration);
 }
+
+/**
+ * Play warning chime - subtle low-frequency tone for danger scores
+ * Used when trust score drops below 30
+ */
+export function playWarningChime(): void {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  if (ctx.state === 'suspended') {
+    ctx.resume();
+  }
+
+  const now = ctx.currentTime;
+  const duration = 0.4;
+
+  const oscillator = ctx.createOscillator();
+  const gainNode = ctx.createGain();
+
+  // Low frequency warning tone
+  oscillator.type = 'sine';
+  oscillator.frequency.setValueAtTime(196, now); // G3 (low)
+  oscillator.frequency.setValueAtTime(165, now + 0.2); // E3 (lower)
+
+  // Subtle volume
+  gainNode.gain.setValueAtTime(0, now);
+  gainNode.gain.linearRampToValueAtTime(0.15, now + 0.05);
+  gainNode.gain.linearRampToValueAtTime(0.1, now + 0.2);
+  gainNode.gain.linearRampToValueAtTime(0, now + duration);
+
+  oscillator.connect(gainNode);
+  gainNode.connect(ctx.destination);
+
+  oscillator.start(now);
+  oscillator.stop(now + duration);
+}

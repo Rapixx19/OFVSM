@@ -82,3 +82,12 @@ export function triggerHaptic(type: HapticType): void {
       break;
   }
 }
+
+/**
+ * Jackpot pulse - celebratory haptic for 100/100 trust score
+ * Pattern: Three rapid pulses (40ms each, 30ms gaps)
+ */
+export function jackpotPulse(): void {
+  if (!isHapticsSupported()) return;
+  navigator.vibrate([40, 30, 40, 30, 40]);
+}

@@ -5,3 +5,4 @@
 
 export { SafetyBadge, SafetyBadgeInline } from './SafetyBadge';
 export { SafetyCertificate, SentinelBadgeInline } from './SafetyCertificate';
+export { SentinelScoreboard } from './SentinelScoreboard';

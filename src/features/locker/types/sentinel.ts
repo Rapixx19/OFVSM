@@ -11,7 +11,19 @@ export type SecurityEventType =
   | 'lock_confirmed'
   | 'expiring_soon'
   | 'lock_extended'
-  | 'unlock_detected';
+  | 'unlock_detected'
+  | 'audit_requested'
+  | 'audit_completed';
+
+// Re-export trust score types
+export type {
+  TrustScore,
+  TrustPillar,
+  TrustGrade,
+  AuditParams,
+  PillarStatus,
+} from './trustScore';
+export { GRADE_COLORS, GRADE_BG_COLORS } from './trustScore';
 
 /**
  * Security certificate issued by the Sentinel Agent
