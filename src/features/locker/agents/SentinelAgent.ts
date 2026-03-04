@@ -4,11 +4,12 @@
  * @dependencies @solana/web3.js, @supabase/supabase-js
  */
 
-import { Connection, PublicKey } from '@solana/web3.js';
+import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { LockerAccount } from '../types/locker';
 import type { SecurityCertificate, ExpiringLock } from '../types/sentinel';
 import { getLockerAccount } from '../services/lockerService';
+import type { AggregatedBalance } from '@/features/wallets/types/wallet';
 
 /**
  * Contract audit hash for verification
@@ -199,6 +200,90 @@ export class SentinelAgent {
    */
   private getContractAuditHash(): string {
     return CONTRACT_AUDIT_HASH;
+  }
+
+  /**
+   * Aggregate balances across multiple wallets
+   * Uses getMultipleAccountsInfo for efficient batch fetching
+   *
+   * @param walletAddresses - Array of wallet addresses to aggregate
+   * @returns Aggregated balance totals
+   */
+  async aggregateBalances(walletAddresses: string[]): Promise<AggregatedBalance> {
+    if (walletAddresses.length === 0) {
+      return {
+        totalSol: 0,
+        tokenBalances: new Map(),
+        walletCount: 0,
+        lastUpdated: Date.now(),
+      };
+    }
+
+    try {
+      // Convert addresses to PublicKeys
+      const publicKeys = walletAddresses.map((addr) => new PublicKey(addr));
+
+      // Fetch all account infos in a single RPC call
+      const accountInfos = await this.connection.getMultipleAccountsInfo(
+        publicKeys,
+        'confirmed'
+      );
+
+      // Sum SOL balances
+      let totalSol = 0;
+      for (const accountInfo of accountInfos) {
+        if (accountInfo) {
+          totalSol += accountInfo.lamports / LAMPORTS_PER_SOL;
+        }
+      }
+
+      return {
+        totalSol,
+        tokenBalances: new Map(), // Token balance aggregation can be added later
+        walletCount: walletAddresses.length,
+        lastUpdated: Date.now(),
+      };
+    } catch (error) {
+      console.error('Failed to aggregate balances:', error);
+      return {
+        totalSol: 0,
+        tokenBalances: new Map(),
+        walletCount: 0,
+        lastUpdated: Date.now(),
+      };
+    }
+  }
+
+  /**
+   * Aggregate balances for a user's verified wallets
+   *
+   * @param supabase - Supabase client
+   * @param profileId - User's profile ID
+   * @returns Aggregated balance totals
+   */
+  async aggregateUserBalances(
+    supabase: SupabaseClient,
+    profileId: string
+  ): Promise<AggregatedBalance> {
+    // Fetch verified wallets for the user
+    const { data: wallets, error } = await supabase
+      .from('user_wallets')
+      .select('wallet_address')
+      .eq('profile_id', profileId)
+      .or('is_verified.eq.true,is_main.eq.true');
+
+    if (error || !wallets) {
+      console.error('Failed to fetch user wallets:', error);
+      return {
+        totalSol: 0,
+        tokenBalances: new Map(),
+        walletCount: 0,
+        lastUpdated: Date.now(),
+      };
+    }
+
+    const addresses = wallets.map((w) => w.wallet_address);
+    return this.aggregateBalances(addresses);
   }
 }
 

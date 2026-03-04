@@ -44,6 +44,49 @@ export interface Database {
         };
         Relationships: [];
       };
+      user_wallets: {
+        Row: {
+          id: string;
+          profile_id: string;
+          wallet_address: string;
+          label: string | null;
+          is_main: boolean;
+          is_verified: boolean;
+          verified_at: string | null;
+          nonce: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          profile_id: string;
+          wallet_address: string;
+          label?: string | null;
+          is_main?: boolean;
+          is_verified?: boolean;
+          verified_at?: string | null;
+          nonce?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          profile_id?: string;
+          wallet_address?: string;
+          label?: string | null;
+          is_main?: boolean;
+          is_verified?: boolean;
+          verified_at?: string | null;
+          nonce?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'user_wallets_profile_id_fkey';
+            columns: ['profile_id'];
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          }
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -68,3 +111,18 @@ export type ProfileInsert = Database['public']['Tables']['profiles']['Insert'];
  * Convenience type for profile update
  */
 export type ProfileUpdate = Database['public']['Tables']['profiles']['Update'];
+
+/**
+ * Convenience type for user_wallets row
+ */
+export type UserWalletRow = Database['public']['Tables']['user_wallets']['Row'];
+
+/**
+ * Convenience type for user_wallets insert
+ */
+export type UserWalletInsert = Database['public']['Tables']['user_wallets']['Insert'];
+
+/**
+ * Convenience type for user_wallets update
+ */
+export type UserWalletUpdate = Database['public']['Tables']['user_wallets']['Update'];
