@@ -18,13 +18,26 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
+      reportsDirectory: './coverage',
+      include: ['src/features/**/*.ts', 'src/features/**/*.tsx'],
       exclude: [
         'node_modules/',
         '.next/',
         '**/*.d.ts',
         '**/*.config.*',
         '**/types/**',
+        '**/__tests__/**',
+        '**/*.test.ts',
+        '**/*.test.tsx',
       ],
+      // Thresholds can be enforced once coverage improves
+      // Current baseline: statements 27%, branches 77%, functions 26%, lines 27%
+      thresholds: {
+        branches: 70,
+        functions: 20,
+        lines: 25,
+        statements: 25,
+      },
     },
   },
   resolve: {
