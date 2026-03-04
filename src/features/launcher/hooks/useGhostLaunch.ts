@@ -27,6 +27,8 @@ import {
   DEFAULT_TOTAL_SUPPLY,
   DEFAULT_TIP_LAMPORTS,
 } from '../constants/addresses';
+import { warningPattern } from '@/core/utils/haptics';
+import { playErrorTone } from '@/core/utils/audio';
 
 /**
  * Default launch parameters
@@ -234,6 +236,8 @@ export function useGhostLaunch(): UseGhostLaunchReturn {
   // Launch function
   const launch = useCallback(async () => {
     if (!canLaunch) {
+      warningPattern();
+      playErrorTone();
       setError(new Error('Invalid launch parameters'));
       return;
     }
@@ -276,6 +280,8 @@ export function useGhostLaunch(): UseGhostLaunchReturn {
       setStatus('success');
       setResult(bundleResult);
     } catch (err) {
+      warningPattern();
+      playErrorTone();
       setStatus('error');
       setError(err instanceof Error ? err : new Error(String(err)));
     }
