@@ -12,6 +12,8 @@ import { useAuthStore } from '@/store/authStore';
 import { toUserWallet } from '../types/wallet';
 import type { UserWalletRow } from '@/types/database';
 import { useMultiWalletStore, generateNonce } from '../store/multiWalletStore';
+import { warningPattern } from '@/core/utils/haptics';
+import { playErrorTone } from '@/core/utils/audio';
 
 export function useWalletActions() {
   const store = useMultiWalletStore();
@@ -37,6 +39,8 @@ export function useWalletActions() {
       }
     } catch (err) {
       store.setError(err instanceof Error ? err : new Error('Failed to fetch wallets'));
+      warningPattern();
+      playErrorTone();
     } finally {
       store.setLoading(false);
     }
@@ -78,6 +82,8 @@ export function useWalletActions() {
         return true;
       } catch (err) {
         store.setError(err instanceof Error ? err : new Error('Failed to add wallet'));
+        warningPattern();
+        playErrorTone();
         return false;
       }
     },
@@ -106,6 +112,8 @@ export function useWalletActions() {
         return true;
       } catch (err) {
         store.setError(err instanceof Error ? err : new Error('Failed to remove wallet'));
+        warningPattern();
+        playErrorTone();
         return false;
       }
     },
@@ -121,6 +129,8 @@ export function useWalletActions() {
         return true;
       } catch (err) {
         store.setError(err instanceof Error ? err : new Error('Failed to update label'));
+        warningPattern();
+        playErrorTone();
         return false;
       }
     },
