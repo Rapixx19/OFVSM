@@ -85,8 +85,8 @@ export default function PortfolioPage() {
     return verifyAltWallet();
   };
 
-  const handleCloseModal = () => {
-    cancelVerification();
+  const handleCloseModal = async () => {
+    await cancelVerification();
     setIsAddModalOpen(false);
   };
 
