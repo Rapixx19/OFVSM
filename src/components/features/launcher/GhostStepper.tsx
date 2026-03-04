@@ -8,10 +8,12 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGhostLaunch } from '@/features/launcher/hooks/useGhostLaunch';
+import { useStrategist } from '@/features/orchestrator/hooks/useStrategist';
 import { STEPS } from '@/features/launcher/types/ghost';
 import { BrandingStep } from './steps/BrandingStep';
 import { EconomicsStep } from './steps/EconomicsStep';
 import { ReviewStep } from './steps/ReviewStep';
+import { lightTap } from '@/core/utils/haptics';
 
 /**
  * Step indicator component
@@ -114,6 +116,25 @@ export function GhostStepper() {
     reset,
   } = useGhostLaunch();
 
+  // Strategist agent for market-optimized execution
+  const {
+    executionType,
+    setExecutionType,
+    lastConditions,
+    isLoading: isStrategistLoading,
+  } = useStrategist();
+
+  // Wrap step navigation with haptic feedback
+  const handleNextStep = () => {
+    lightTap();
+    nextStep();
+  };
+
+  const handlePrevStep = () => {
+    lightTap();
+    prevStep();
+  };
+
   return (
     <div className="mx-auto w-full max-w-md">
       {/* Card container */}
@@ -132,7 +153,7 @@ export function GhostStepper() {
               params={params}
               errors={validationErrors}
               onUpdate={updateParams}
-              onNext={nextStep}
+              onNext={handleNextStep}
               canNext={canGoNext}
             />
           )}
@@ -143,8 +164,8 @@ export function GhostStepper() {
               params={params}
               errors={validationErrors}
               onUpdate={updateParams}
-              onNext={nextStep}
-              onPrev={prevStep}
+              onNext={handleNextStep}
+              onPrev={handlePrevStep}
               canNext={canGoNext}
             />
           )}
@@ -160,10 +181,14 @@ export function GhostStepper() {
               onUpdate={updateParams}
               onCalculateFees={calculateFees}
               onLaunch={launch}
-              onPrev={prevStep}
+              onPrev={handlePrevStep}
               onReset={reset}
               canLaunch={isValidForLaunch}
               isLoading={isLoading}
+              executionType={executionType}
+              onExecutionTypeChange={setExecutionType}
+              lastConditions={lastConditions}
+              isStrategistLoading={isStrategistLoading}
             />
           )}
         </AnimatePresence>

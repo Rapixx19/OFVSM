@@ -7,7 +7,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
+import { lightTap } from '@/core/utils/haptics';
 
 interface SpeedGaugeProps {
   remainingCapSol: number;
@@ -56,6 +57,11 @@ export function SpeedGauge({
 
   const color = useMemo(() => getGaugeColor(percent), [percent]);
 
+  const handleClick = useCallback(() => {
+    lightTap();
+    onClick?.();
+  }, [onClick]);
+
   // SVG circle parameters
   const size = 48;
   const strokeWidth = 4;
@@ -67,7 +73,7 @@ export function SpeedGauge({
     <motion.button
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
-      onClick={onClick}
+      onClick={handleClick}
       className="group relative flex items-center gap-2 rounded-full
         border border-gray-700 bg-gray-900/80 px-3 py-1.5
         transition-colors hover:border-gray-600"
