@@ -4,7 +4,6 @@
  * @dependencies @solana/web3.js
  */
 
-import type { PublicKey } from '@solana/web3.js';
 import type { BundleAddresses } from '@/features/launcher/types/ghost';
 
 /**

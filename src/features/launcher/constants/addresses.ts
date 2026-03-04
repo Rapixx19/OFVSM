@@ -111,7 +111,7 @@ export const JITO_TIP_ACCOUNTS: PublicKey[] = [
  */
 export function getRandomTipAccount(): PublicKey {
   const index = Math.floor(Math.random() * JITO_TIP_ACCOUNTS.length);
-  return JITO_TIP_ACCOUNTS[index];
+  return JITO_TIP_ACCOUNTS[index]!;
 }
 
 /**

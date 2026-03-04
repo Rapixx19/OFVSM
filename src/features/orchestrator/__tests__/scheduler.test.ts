@@ -7,7 +7,7 @@
 import { describe, it, expect } from 'vitest';
 import { PublicKey } from '@solana/web3.js';
 
-import type { ScheduledLaunch, ScheduledLaunchRow } from '../types/scheduler';
+import type { ScheduledLaunchRow } from '../types/scheduler';
 import {
   rowToScheduledLaunch,
   MAX_PENDING_LAUNCHES,

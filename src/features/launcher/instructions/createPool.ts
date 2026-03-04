@@ -10,16 +10,10 @@ import {
   TransactionInstruction,
   SYSVAR_RENT_PUBKEY,
 } from '@solana/web3.js';
-import { TOKEN_2022_PROGRAM_ID } from '@solana/spl-token';
 import {
   RAYDIUM_CPMM_PROGRAM,
   RAYDIUM_AMM_CONFIG,
 } from '../constants/addresses';
-
-/**
- * Raydium CPMM pool state size
- */
-const POOL_STATE_SIZE = 637;
 
 /**
  * Seeds for deriving pool PDAs
@@ -90,9 +84,11 @@ export function sortMints(
   const mint1Bytes = mint1.toBytes();
 
   for (let i = 0; i < 32; i++) {
-    if (mint0Bytes[i] < mint1Bytes[i]) {
+    const byte0 = mint0Bytes[i]!;
+    const byte1 = mint1Bytes[i]!;
+    if (byte0 < byte1) {
       return [mint0, mint1];
-    } else if (mint0Bytes[i] > mint1Bytes[i]) {
+    } else if (byte0 > byte1) {
       return [mint1, mint0];
     }
   }

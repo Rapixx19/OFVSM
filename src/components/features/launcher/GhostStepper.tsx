@@ -103,7 +103,6 @@ export function GhostStepper() {
     error,
     result,
     validationErrors,
-    isValidForCurrentStep,
     isValidForLaunch,
     canGoNext,
     isLoading,

@@ -12,7 +12,6 @@ import {
   TransactionMessage,
   VersionedTransaction,
   SystemProgram,
-  LAMPORTS_PER_SOL,
 } from '@solana/web3.js';
 import {
   TOKEN_2022_PROGRAM_ID,
@@ -20,7 +19,6 @@ import {
   createAssociatedTokenAccountInstruction,
   NATIVE_MINT,
 } from '@solana/spl-token';
-import { BN } from '@coral-xyz/anchor';
 
 import type {
   LaunchParams,
@@ -33,7 +31,6 @@ import {
   LOCKER_PROGRAM_ID,
   JITO_BLOCK_ENGINE_URL,
   calculateTotalRent,
-  getRandomTipAccount,
   DEFAULT_DECIMALS,
 } from '../constants/addresses';
 import {

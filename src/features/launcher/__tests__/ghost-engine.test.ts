@@ -4,7 +4,7 @@
  * @dependencies vitest, @solana/web3.js, @coral-xyz/anchor
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { PublicKey, Connection } from '@solana/web3.js';
 import { BN } from '@coral-xyz/anchor';
 
@@ -12,7 +12,6 @@ import type { LaunchParams } from '../types/ghost';
 import { validateLaunchParams, isValidForLaunch } from '../types/ghost';
 import {
   PLATFORM_FEE_BPS,
-  calculatePlatformFee,
   calculateTotalRent,
   getRandomTipAccount,
   JITO_TIP_ACCOUNTS,

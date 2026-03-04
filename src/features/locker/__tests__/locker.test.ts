@@ -4,7 +4,7 @@
  * @dependencies vitest, @solana/web3.js, @coral-xyz/anchor
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { PublicKey } from '@solana/web3.js';
 import { BN } from '@coral-xyz/anchor';
 import {

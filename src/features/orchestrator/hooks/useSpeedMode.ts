@@ -10,7 +10,6 @@ import { create } from 'zustand';
 import { useCallback, useEffect } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { Keypair, Transaction } from '@solana/web3.js';
-import bs58 from 'bs58';
 
 import type { SessionKey, SpeedModeState } from '../types/speedMode';
 import {
@@ -29,7 +28,6 @@ import {
   generateSessionKeypair,
   createInitSessionInstruction,
   encryptSecretKey,
-  decryptSecretKey,
   deriveEncryptionKey,
 } from '../services/sessionPda';
 

@@ -7,10 +7,8 @@
 import {
   PublicKey,
   Keypair,
-  Connection,
   SystemProgram,
   TransactionInstruction,
-  Transaction,
 } from '@solana/web3.js';
 import { SESSION_SEED, DEFAULT_SOL_CAP_LAMPORTS } from '../types/speedMode';
 
@@ -106,10 +104,12 @@ export async function encryptSecretKey(
   encryptionKey: CryptoKey
 ): Promise<ArrayBuffer> {
   const iv = crypto.getRandomValues(new Uint8Array(12));
+  // Create a copy to ensure we have a proper ArrayBuffer
+  const secretKeyBuffer = new Uint8Array(secretKey).buffer;
   const encrypted = await crypto.subtle.encrypt(
     { name: 'AES-GCM', iv },
     encryptionKey,
-    secretKey
+    secretKeyBuffer
   );
 
   // Prepend IV to encrypted data
@@ -130,11 +130,13 @@ export async function decryptSecretKey(
   const data = new Uint8Array(encryptedData);
   const iv = data.slice(0, 12);
   const encrypted = data.slice(12);
+  // Create a copy to ensure we have a proper ArrayBuffer
+  const encryptedBuffer = new Uint8Array(encrypted).buffer;
 
   const decrypted = await crypto.subtle.decrypt(
     { name: 'AES-GCM', iv },
     encryptionKey,
-    encrypted
+    encryptedBuffer
   );
 
   return new Uint8Array(decrypted);
@@ -146,18 +148,21 @@ export async function decryptSecretKey(
 export async function deriveEncryptionKey(
   signature: Uint8Array
 ): Promise<CryptoKey> {
+  // Create a copy to ensure we have a proper ArrayBuffer
+  const sigBuffer = new Uint8Array(signature.slice(0, 32)).buffer;
   const keyMaterial = await crypto.subtle.importKey(
     'raw',
-    signature.slice(0, 32),
+    sigBuffer,
     'PBKDF2',
     false,
     ['deriveKey']
   );
 
+  const salt = new TextEncoder().encode('vecterai-speed-mode');
   return crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt: new TextEncoder().encode('vecterai-speed-mode'),
+      salt: new Uint8Array(salt).buffer,
       iterations: 100000,
       hash: 'SHA-256',
     },
