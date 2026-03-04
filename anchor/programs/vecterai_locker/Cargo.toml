@@ -1,0 +1,32 @@
+# @file Cargo.toml
+# @summary VECTERAI Locker program dependencies
+# @dependencies anchor-lang, anchor-spl, spl-token-2022
+
+[package]
+name = "vecterai_locker"
+version = "0.1.0"
+description = "LP Token Locker for VECTERAI Foundation Safe Standard compliance"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/vecterai/foundation"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "vecterai_locker"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = { version = "0.30.1", features = ["init-if-needed"] }
+anchor-spl = { version = "0.30.1", features = ["token_2022"] }
+spl-token-2022 = { version = "3.0.4", features = ["no-entrypoint"] }
+
+[dev-dependencies]
+solana-program-test = "1.18"
+solana-sdk = "1.18"
+tokio = "1.28"

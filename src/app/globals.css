@@ -1,0 +1,63 @@
+/**
+ * @file globals.css
+ * @summary Global styles and Tailwind CSS imports for VECTERAI Foundation
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 255, 255, 255;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+@layer base {
+  /**
+   * Font family utilities
+   */
+  .font-sans {
+    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  .font-mono {
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  }
+}
+
+@layer components {
+  /**
+   * Cyan glow effect for "Safe" balance display
+   */
+  .glow-cyan {
+    text-shadow: 0 0 10px theme('colors.cyan.400 / 50%'),
+                 0 0 20px theme('colors.cyan.400 / 30%'),
+                 0 0 30px theme('colors.cyan.400 / 20%');
+  }
+
+  /**
+   * Safe area padding for ticker display
+   */
+  .safe-area-top {
+    padding-top: max(env(safe-area-inset-top), 1rem);
+  }
+}

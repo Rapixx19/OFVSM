@@ -1,0 +1,68 @@
+# VECTERAI Foundation - Cursor Rules
+
+## Plan Mode First Workflow
+- Always start with a plan before implementing any feature
+- Create a brief outline of changes before writing code
+- Get confirmation on approach before proceeding with complex changes
+
+## Micro-File Strategy
+- **150 line limit** per file (hard limit)
+- If a file exceeds 150 lines, split into smaller modules
+- Prefer many small, focused files over few large files
+- Each file should have a single responsibility
+
+## File Summaries Requirement
+- Every file must start with a File Summary block comment
+- Format:
+  ```typescript
+  /**
+   * @file filename.ts
+   * @summary Brief description of file purpose (1-2 sentences)
+   * @dependencies List key dependencies/imports if relevant
+   */
+  ```
+- Update summary when file purpose changes
+
+## Pre-Finish Check Workflow
+Before marking any task complete:
+1. Verify all tests pass (`npm run test:safe`)
+2. Verify TypeScript compiles (`npm run typecheck`)
+3. Ensure no ESLint errors
+4. Check file line counts (150 max)
+5. Verify File Summary is present and accurate
+
+## Post-Action Summary Requirement
+After completing any significant action:
+- Provide a brief summary of what was done
+- List any files created/modified
+- Note any follow-up actions needed
+- Flag any potential issues or technical debt
+
+## Code Style
+- Use TypeScript strict mode
+- Prefer explicit types over inference for public APIs
+- Use descriptive variable and function names
+- Keep functions small and focused (< 30 lines ideal)
+
+## Testing Requirements
+- Write tests for all business logic
+- Use Vitest for unit/integration tests
+- Place tests in `__tests__` directories near source
+- Test file naming: `*.test.ts` or `*.spec.ts`
+
+## Feature Module Structure
+Each feature should follow this structure:
+```
+features/[feature-name]/
+├── hooks/          # React hooks
+├── services/       # Business logic
+├── components/     # UI components (when needed)
+├── types/          # Feature-specific types (when needed)
+└── __tests__/      # Tests
+```
+
+## Import Order
+1. External dependencies (react, next, etc.)
+2. Internal aliases (@/core, @/types, etc.)
+3. Relative imports
+4. Type imports (use `import type` when possible)
