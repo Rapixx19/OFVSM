@@ -6,12 +6,13 @@
 
 'use client';
 
-import { useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { successPulse } from '@/core/utils/haptics';
+import { useRef, useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { successPulse, lightTap } from '@/core/utils/haptics';
 import { playSuccessChime } from '@/core/utils/audio';
 import { ShareButton } from './ShareButton';
 import { DownloadButton } from './DownloadButton';
+import { HypeGenerator } from './HypeGenerator';
 
 interface SuccessCardProps {
   ticker: string;
@@ -20,6 +21,8 @@ interface SuccessCardProps {
   timestamp: Date;
   lockDays: number;
   onClose: () => void;
+  /** Enable AI Hype Generator feature (opt-in, default false) */
+  enableHypeGenerator?: boolean;
 }
 
 /**
@@ -53,8 +56,10 @@ export function SuccessCard({
   timestamp,
   lockDays,
   onClose,
+  enableHypeGenerator = false,
 }: SuccessCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const [showHypeGenerator, setShowHypeGenerator] = useState(false);
 
   // Play haptic and audio feedback on mount
   useEffect(() => {
@@ -134,6 +139,37 @@ export function SuccessCard({
           <ShareButton ticker={ticker} signature={signature} lockDays={lockDays} />
           <DownloadButton cardRef={cardRef} ticker={ticker} />
         </div>
+
+        {/* AI Hype Generator (opt-in feature) */}
+        {enableHypeGenerator && (
+          <>
+            {!showHypeGenerator && (
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => { setShowHypeGenerator(true); lightTap(); }}
+                className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl
+                  border border-purple-500/30 bg-purple-500/10 px-4 py-3
+                  font-medium text-purple-400 transition-colors hover:bg-purple-500/20"
+              >
+                <span>✨</span>
+                <span>AI Hype Generator</span>
+              </motion.button>
+            )}
+
+            <AnimatePresence>
+              {showHypeGenerator && (
+                <HypeGenerator
+                  ticker={ticker}
+                  mintAddress={mintAddress}
+                  signature={signature}
+                  lockDays={lockDays}
+                  onClose={() => setShowHypeGenerator(false)}
+                />
+              )}
+            </AnimatePresence>
+          </>
+        )}
       </motion.div>
     </motion.div>
   );

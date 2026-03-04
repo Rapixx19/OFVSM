@@ -8,3 +8,4 @@ export { GhostStepper } from './GhostStepper';
 export { SuccessCard } from './SuccessCard';
 export { ShareButton } from './ShareButton';
 export { DownloadButton } from './DownloadButton';
+export { HypeGenerator } from './HypeGenerator';
